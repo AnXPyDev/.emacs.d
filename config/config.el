@@ -1,39 +1,9 @@
-(defun config/path(path)
-  (concat user-emacs-directory path))
+(lightning-load-module "package-manager")
+(lightning-load-module "make-no-insert-keymap")
+(lightning-load-module "modal")
+(lightning-load-module "sensible-defaults")
 
-(defun config/reload()
-  (interactive)
-  (org-babel-load-file (config/path "config.org")))
-
-(require 'package)
-
-(package-initialize)
-(setq package-archives '(("melpa" . "http://melpa.org/packages/")
-                         ("elpa" . "http://elpa.gnu.org/packages/")))
-
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
-(defun package-use(name &rest args)
-  (unless (package-installed-p name)
-    (package-install name))
-  (setq arg-require (plist-get args :require))
-  (setq arg-require-name (plist-get args :require-name))
-  (if arg-require
-      (require name)
-    (when arg-require-name
-      (require arg-require-name))))
-
-(setq ring-bell-function 'ignore)
-
-(ignore-errors (tool-bar-mode 0))
-(ignore-errors (menu-bar-mode 0))
-(ignore-errors (scroll-bar-mode 0))
-(add-hook 'after-init-hook (lambda() (interactive) (ignore-errors (scroll-bar-mode 0))))
-
-(setq make-backup-files nil)
-(setq auto-save-default nil)
+(setq lightning-user-name "AnXPyDev")
 
 (electric-pair-mode 1)
 
@@ -42,69 +12,59 @@
 
 (global-visual-line-mode 1)
 
-(setq config/indent-size 2)
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width config/indent-size)
+(setq lightning-user-indent-offset 2)
+(setq lightning-user-indent-use-spaces t)
 
 (setq-default scroll-step 1)
 
 (setq auto-revert-verbose nil)
 (global-auto-revert-mode)
 
-(defalias 'yes-or-no-p 'y-or-n-p)
-
-(setq config/default-cursor '(hbar . 2))
-(setq config/insert-cursor 'bar)
-(setq-default cursor-type config/default-cursor)
+(setq lightning-user-default-cursor-type 'hbar)
 (blink-cursor-mode 0)
 
-(setq custom-safe-themes t)
+(lightning-apply-user-variables)
 
-(package-use 'general :require t)
+(lightning-pkg general :require t)
 
-(package-use 'which-key :require t)
+(lightning-pkg which-key :require t)
 (which-key-mode 1)
 
-(package-use 'swiper :require t)
+(lightning-pkg swiper :require t)
 
-(package-use 'company :require t)
+(lightning-pkg company :require t)
 
-(package-use 'projectile :require t)
+(lightning-pkg projectile :require t)
 (projectile-global-mode 1)
 
-(package-use 'ivy :require t)
+(lightning-pkg ivy :require t)
 (ivy-mode 1)
 
-(package-use 'beacon :require t)
-(beacon-mode 1)
-
-(package-use 'highlight-parentheses :require t)
+(lightning-pkg highlight-parentheses :require t)
 (global-highlight-parentheses-mode)
 
-(package-use 'dashboard :require t)
+(lightning-pkg dashboard :require t)
 (dashboard-setup-startup-hook)
-(setq dashboard-startup-banner (config/path "banner.png"))
+(setq dashboard-startup-banner (concat lightning-config-directory "banner.png"))
 (setq dashboard-items '((recents . 5)
       (projects . 5)))
 (setq dashboard-banner-logo-title "Welcome to Emacs.")
 
-(package-use 'minor-mode-hack :require t)
+(lightning-pkg minor-mode-hack :require t)
 
-(package-use 'avy :require t)
+(lightning-pkg avy :require t)
 
-(package-use 'elmacro :require t)
+(lightning-pkg elmacro :require t)
 (elmacro-mode 1)
 
-(package-use 'exwm :require t)
-
-(package-use 'undo-tree :require t)
+(lightning-pkg undo-tree :require t)
 (global-undo-tree-mode)
 
-(package-use 'expand-region :require t)
+(lightning-pkg expand-region :require t)
 
-(package-use 'multiple-cursors :require t)
+(lightning-pkg multiple-cursors :require t)
 
-(package-use 'flycheck :require t)
+(lightning-pkg flycheck :require t)
 (global-flycheck-mode t)
 
 (define-fringe-bitmap 'flycheck-fringe-bitmap-rectangle
@@ -155,17 +115,19 @@
 
 (setq flycheck-display-errors-function nil)
 
-(package-use 'origami :require t)
+(lightning-pkg origami :require t)
 (global-origami-mode t)
 
-(package-use 'hlinum :require t)
+(lightning-pkg hlinum :require t)
 
-(package-use 'kaolin-themes)
-(package-use 'arc-dark-theme)
+(lightning-pkg kaolin-themes)
+(lightning-pkg arc-dark-theme)
 
-(package-use 'lua-mode :require t)
+(setq-default python-indent-offset lightning-user-indent-offset)
 
-(package-use 'company-lua :require t)
+(lightning-pkg lua-mode :require t)
+
+(lightning-pkg company-lua :require t)
 (eval-after-load 'company
   '(add-to-list 'company-backends 'company-lua))
 
@@ -241,11 +203,11 @@ to the left by the amount specified in lua-indent-level."
                   (current-indentation)
                 (current-indentation))))))))
 
-(package-use 'moonscript :require t)
+(lightning-pkg moonscript :require t)
 
-(package-use 'irony :require t)
-(package-use 'company-irony :require t)
-(package-use 'company-c-headers :require t)
+(lightning-pkg irony :require t)
+(lightning-pkg company-irony :require t)
+(lightning-pkg company-c-headers :require t)
 
 (defun lang-c/add-hook (func-name)
   (add-hook 'c++-mode-hook func-name)
@@ -263,7 +225,7 @@ to the left by the amount specified in lua-indent-level."
 
 (setq-default sh-basic-offset tab-width)
 
-(package-use 'd-mode :require t)
+(lightning-pkg d-mode :require t)
 
 (setq self-inserting-characters '("`" "1" "2" "3" "4" "5" "6" "7" "8" "9" "0" "-" "=" "q" "w" "e" "r" "t" "y" "u" "i" "o" "p" "[" "]" "a" "s" "d" "f" "g" "h" "j" "k" "l" ";" "'" "\\" "z" "x" "c" "v" "b" "n" "m" "," "." "/" "TAB" "SPC" "<tab>" "<space>" "~" "@" "#" "$" "%" "^" "&" "*" "(" ")" "_" "+" "Q" "W" "E" "R" "T" "Y" "U" "I" "O" "P" "{" "}" "A" "S" "D" "F" "G" "H" "J" "K" "L" ":" "\"" "|" ">" "Z" "X" "C" "V" "B" "N" "M" "<" ">" "?" "DEL"))
 
@@ -296,8 +258,8 @@ to the left by the amount specified in lua-indent-level."
  "C-SPC" leader-map
  "C-@" leader-map
  "<escape>" (kbd "C-g")
- "M-q" (lambda() (interactive) (lmodal-raise-default-mode))
- "M-e" (lambda() (interactive) (lmodal-disable-all-modes)))
+ "M-q" (lambda() (interactive) (lightning-modal-raise-default-mode))
+ "M-e" (lambda() (interactive) (lightning-modal-disable-all-modes)))
 
 (setq modal/normal-bare-map (make-sparse-keymap))
 
@@ -319,7 +281,7 @@ to the left by the amount specified in lua-indent-level."
 
 (general-define-key
  :keymaps 'modal/normal-map
- "q" (lambda() (interactive) (lmodal-raise-mode insert))
+ "q" (lambda() (interactive) (lightning-modal-raise-mode insert))
  "Q" 'edit/insert-beginning-of-line
  "r" 'edit/insert-after
  "R" 'edit/insert-end-of-line
@@ -335,9 +297,9 @@ to the left by the amount specified in lua-indent-level."
  "u" 'undo-tree-undo
  "U" 'undo-tree-redo
  "n" 'edit/open-line
- "N" (lambda() (interactive) (edit/open-line) (lmodal-raise-mode insert))
+ "N" (lambda() (interactive) (edit/open-line) (lightning-modal-raise-mode insert))
  "p" 'edit/open-line-above
- "P" (lambda() (interactive) (edit/open-line-above) (lmodal-raise-mode insert))
+ "P" (lambda() (interactive) (edit/open-line-above) (lightning-modal-raise-mode insert))
  "g" nil
  "g l" 'isearch-forward
  "g h" 'isearch-backward
@@ -352,37 +314,37 @@ to the left by the amount specified in lua-indent-level."
 
 (general-define-key
  :keymaps 'modal/region-map
- "t" (lambda() (interactive) (kill-region (region-beginning) (region-end)) (lmodal-raise-mode insert))
- "s" (lambda() (interactive) (copy-region-as-kill (region-beginning) (region-end)) (lmodal-raise-default-mode))
- "d" (lambda() (interactive) (kill-region (region-beginning) (region-end)) (lmodal-raise-default-mode))
+ "t" (lambda() (interactive) (kill-region (region-beginning) (region-end)) (lightning-modal-raise-mode insert))
+ "s" (lambda() (interactive) (copy-region-as-kill (region-beginning) (region-end)) (lightning-modal-raise-default-mode))
+ "d" (lambda() (interactive) (kill-region (region-beginning) (region-end)) (lightning-modal-raise-default-mode))
  "w" 'edit/yank-region
- "C-g" (lambda() (interactive) (pop-mark) (lmodal-raise-default-mode))
- "M-q" (lambda() (interactive) (pop-mark) (lmodal-raise-default-mode))
- "<escape>" (lambda() (interactive) (pop-mark) (lmodal-raise-default-mode))
+ "C-g" (lambda() (interactive) (pop-mark) (lightning-modal-raise-default-mode))
+ "M-q" (lambda() (interactive) (pop-mark) (lightning-modal-raise-default-mode))
+ "<escape>" (lambda() (interactive) (pop-mark) (lightning-modal-raise-default-mode))
  "e" 'er/expand-region
- "TAB" (lambda() (interactive) (indent-region (region-beginning) (region-end)) (lmodal-raise-default-mode))
- "<tab>" (lambda() (interactive) (indent-region (region-beginning) (region-end)) (lmodal-raise-deafult-mode))
+ "TAB" (lambda() (interactive) (indent-region (region-beginning) (region-end)) (lightning-modal-raise-default-mode))
+ "<tab>" (lambda() (interactive) (indent-region (region-beginning) (region-end)) (lightning-modal-raise-default-mode))
  "g" nil
  "g l" 'isearch-forward
  "g h" 'isearch-backward
  ";" 'comment-or-uncomment-region
  "o" nil
- "o (" (lambda() (interactive) (edit/surround-region "(" ")") (lmodal-raise-default-mode))
- "o o" (lambda() (interactive) (edit/surround-region (read-from-minibuffer "left: ") (read-from-minibuffer "right: ")) (lmodal-raise-default-mode))
- "o )" (lambda() (interactive) (edit/surround-region "(" ")") (lmodal-raise-default-mode))
- "o {" (lambda() (interactive) (edit/surround-region "{" "}") (lmodal-raise-default-mode))
- "o }" (lambda() (interactive) (edit/surround-region "{" "}") (lmodal-raise-default-mode))
- "o [" (lambda() (interactive) (edit/surround-region "[" "]") (lmodal-raise-default-mode))
- "o ]" (lambda() (interactive) (edit/surround-region "[" "]") (lmodal-raise-default-mode))
- "o \"" (lambda() (interactive) (edit/surround-region "\"" "\"") (lmodal-raise-default-mode))
- "o <" (lambda() (interactive) (edit/surround-region "<" ">") (lmodal-raise-default-mode))
- "o '" (lambda() (interactive) (edit/surround-region "'" "'") (lmodal-raise-default-mode)))
+ "o (" (lambda() (interactive) (edit/surround-region "(" ")") (lightning-modal-raise-default-mode))
+ "o o" (lambda() (interactive) (edit/surround-region (read-from-minibuffer "left: ") (read-from-minibuffer "right: ")) (lightning-modal-raise-default-mode))
+ "o )" (lambda() (interactive) (edit/surround-region "(" ")") (lightning-modal-raise-default-mode))
+ "o {" (lambda() (interactive) (edit/surround-region "{" "}") (lightning-modal-raise-default-mode))
+ "o }" (lambda() (interactive) (edit/surround-region "{" "}") (lightning-modal-raise-default-mode))
+ "o [" (lambda() (interactive) (edit/surround-region "[" "]") (lightning-modal-raise-default-mode))
+ "o ]" (lambda() (interactive) (edit/surround-region "[" "]") (lightning-modal-raise-default-mode))
+ "o \"" (lambda() (interactive) (edit/surround-region "\"" "\"") (lightning-modal-raise-default-mode))
+ "o <" (lambda() (interactive) (edit/surround-region "<" ">") (lightning-modal-raise-default-mode))
+ "o '" (lambda() (interactive) (edit/surround-region "'" "'") (lightning-modal-raise-default-mode)))
 
 (setq modal/insert-map (make-sparse-keymap))
 
 (general-define-key
  :keymaps 'modal/insert-map
- "C-g" (lambda() (interactive) (lmodal-raise-default-mode)))
+ "C-g" (lambda() (interactive) (lightning-modal-raise-default-mode)))
 
 (general-define-key
  :keymaps 'company-active-map
@@ -402,13 +364,13 @@ to the left by the amount specified in lua-indent-level."
 
 (general-define-key
  :keymaps 'dired-mode-map
- "q" (lambda() (interactive) (wdired-change-to-wdired-mode) (lmodal-raise-default-mode)))
+ "q" (lambda() (interactive) (wdired-change-to-wdired-mode) (lightning-modal-raise-default-mode)))
 
 (setq modal/wdired-normal-map (copy-keymap modal/normal-map))
 
 (general-define-key
  :keymaps 'modal/wdired-normal-map
- "SPC s" (lambda() (interactive) (wdired-finish-edit) (lmodal-raise-default-mode)))
+ "SPC s" (lambda() (interactive) (wdired-finish-edit) (lightning-modal-raise-default-mode)))
 
 (setq modal/org-normal-map (copy-keymap modal/normal-map))
 
@@ -425,26 +387,26 @@ to the left by the amount specified in lua-indent-level."
  "TAB" 'ivy-partial-or-done
  "RET" 'ivy-done)
 
-(lmodal-ignore-major-mode eshell-mode)
-(lmodal-ignore-major-mode dired-mode)
-(lmodal-ignore-major-mode ibuffer-mode)
+(lightning-modal-ignore-major-mode eshell-mode)
+(lightning-modal-ignore-major-mode dired-mode)
+(lightning-modal-ignore-major-mode ibuffer-mode)
 
-(lmodal-define-mode normal :keymap modal/normal-map :lighter " [N]" :doc "Normal mode"
-                    :on-enable (setq cursor-type config/default-cursor))
-(lmodal-define-mode insert :keymap modal/insert-map :lighter " [I]" :doc "Insert mode"
-                    :on-enable (setq cursor-type config/insert-cursor))
-(lmodal-define-mode region :keymap modal/region-map :lighter " [R]" :doc "Region mode"
-                    :on-enable (setq cursor-type config/default-cursor))
-(lmodal-define-mode wdired-normal :keymap modal/wdired-normal-map :lighter " [N]" :doc "Normal mode for wdired"
-                    :on-enable (setq cursor-type config/default-cursor))
-(lmodal-define-mode org-normal :keymap modal/org-normal-map :lighter " [N]" :doc "Normal mode for org"
-                    :on-enable (setq cursor-type config/default-cursor))
+(lightning-modal-define-mode normal :keymap modal/normal-map :lighter " [N]" :doc "Normal mode"
+                    :on-enable (setq cursor-type lightning-user-default-cursor-type))
+(lightning-modal-define-mode insert :keymap modal/insert-map :lighter " [I]" :doc "Insert mode"
+                    :on-enable (setq cursor-type 'bar))
+(lightning-modal-define-mode region :keymap modal/region-map :lighter " [R]" :doc "Region mode"
+                    :on-enable (setq cursor-type lightning-user-default-cursor-type))
+(lightning-modal-define-mode wdired-normal :keymap modal/wdired-normal-map :lighter " [N]" :doc "Normal mode for wdired"
+                    :on-enable (setq cursor-type lightning-user-default-cursor-type))
+(lightning-modal-define-mode org-normal :keymap modal/org-normal-map :lighter " [N]" :doc "Normal mode for org"
+                    :on-enable (setq cursor-type lightning-user-default-cursor-type))
 
-(lmodal-set-default-mode normal)
-(lmodal-pair-major-mode wdired-mode wdired-normal)
-(lmodal-pair-major-mode org-mode org-normal)
+(lightning-modal-set-default-mode normal)
+(lightning-modal-pair-major-mode wdired-mode wdired-normal)
+(lightning-modal-pair-major-mode org-mode org-normal)
 
-(lmodal-global-mode t)
+(lightning-modal-global-mode t)
 
 (defun edit/surround(start end open close)
   (save-excursion
@@ -460,29 +422,29 @@ to the left by the amount specified in lua-indent-level."
 (defun edit/insert-after()
   (interactive)
   (forward-char)
-  (lmodal-raise-mode insert))
+  (lightning-modal-raise-mode insert))
 
 (defun edit/insert-end-of-line()
   (interactive)
   (end-of-line)
-  (lmodal-raise-mode insert))
+  (lightning-modal-raise-mode insert))
 
 (defun edit/insert-beginning-of-line()
   (interactive)
   (beginning-of-line)
-  (lmodal-raise-mode insert))
+  (lightning-modal-raise-mode insert))
 
 (defun edit/set-region()
   (interactive)
   (set-mark (point))
-  (lmodal-raise-mode region))
+  (lightning-modal-raise-mode region))
 
 (defun edit/set-region-line()
   (interactive)
   (beginning-of-line)
   (set-mark (point))
   (end-of-line)
-  (lmodal-raise-mode region))
+  (lightning-modal-raise-mode region))
 
 (defun edit/open-line()
   (interactive)
@@ -518,7 +480,7 @@ to the left by the amount specified in lua-indent-level."
   (interactive)
   (kill-region (region-beginning) (region-end))
   (yank 2)
-  (lmodal-raise-default-mode))
+  (lightning-modal-raise-default-mode))
 
 (defun edit/insert-mark()
   (interactive)
@@ -529,7 +491,7 @@ to the left by the amount specified in lua-indent-level."
   (search-forward "<++>")
   (search-backward "<")
   (delete-char  4)
-  (lmodal-raise-mode insert))
+  (lightning-modal-raise-mode insert))
 
 (defun macro-make-function(&optional name)
   (interactive)
@@ -569,10 +531,17 @@ to the left by the amount specified in lua-indent-level."
   (eshell eshell/new-count)
   (setq eshell/new-count (+ 1 eshell/new-count)))
 
+(defun eshell/clear ()
+  (interactive)
+  "Clear the eshell buffer."
+  (let ((inhibit-read-only t))
+    (erase-buffer)
+    (eshell-send-input)))
+
 (add-hook 'eshell-mode-hook (lambda() (interactive) (linum-mode 0)))
 
-(package-use 'all-the-icons :require t)
-(package-use 'all-the-icons-dired :require t)
+(lightning-pkg all-the-icons :require t)
+(lightning-pkg all-the-icons-dired :require t)
 
 (setq-default header-line-format '(" %b"))
 
