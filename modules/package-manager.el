@@ -16,15 +16,15 @@
        (require ',(or (plist-get args :require-symbol) package-name)))
      ,(plist-get args :config-after)))
 
-(defalias 'lightning-pkg 'lightning-default-pkg)
+(defalias 'pkg 'lightning-default-pkg)
 
 (defun lightning-replace-package-manager(name)
   "Loads either use-package or straight as a package manager and aliases them to lightning-use-package"
   (when (string-equal name "use-package")
     (lightning-load-module "install-use-package")
-    (defalias 'lightning-pkg 'lightning-use-package-wrapper))
+    (defalias 'pkg 'lightning-use-package-wrapper))
   (when (string-equal name "straight")
     (lightning-load-module "bootstrap-straight")
-    (defalias 'lightning-pkg 'lightning-straight-use-package-wrapper))
+    (defalias 'pkg 'lightning-straight-use-package-wrapper))
   (when (string-equal name "lightning")
-    (defalias 'lightning-pkg 'lightning-default-pkg)))
+    (defalias 'pkg 'lightning-default-pkg)))

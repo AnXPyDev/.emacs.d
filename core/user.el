@@ -14,4 +14,4 @@
   (interactive)
   (setq-default indent-tabs-mode (not lightning-user-indent-use-spaces))
   (setq-default tab-width lightning-user-indent-offset)
-  (setq-default cursor-type lightning-user-default-cursor-type))
+  (setq-default cursor-type lightning-user-default-cursor))

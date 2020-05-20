@@ -1,6 +1,5 @@
 ;; Disable annoying sounds
 (setq ring-bell-function 'ignore)
-
 ;; Disable useless UI elements
 (defun lightning-sensible-defaults-clean-up-ui()
   "Disables tool-bar, menu-bar and scroll-bar"

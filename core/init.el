@@ -1,23 +1,14 @@
-;; Keep init.el clear
-(setq custom-file (concat user-emacs-directory "custom.el"))
+(defun parent-directory(dir)
+  (file-name-directory (directory-file-name dir)))
 
-(defvar lightning-emacs-directory user-emacs-directory
-  "Directory containing emacs directory, set to user-emacs-directory by default")
-
-(defvar lightning-core-directory (concat lightning-emacs-directory "core/")
+(defvar lightning-core-directory (concat user-emacs-directory "core/")
   "Directory containing lightining core, set to core in lightning-emacs-directory by default")
 
-(defvar lightning-modules-directory (concat lightning-emacs-directory "modules/")
+(defvar lightning-modules-directory (concat user-emacs-directory "modules/")
   "Directory containing lightining modules, set to modules in lightning-emacs-directory by default")
 
-(defvar lightning-config-directory (concat lightning-emacs-directory "config/")
-  "Directory containing user config, set to config in lightning-emacs-directory by default")
-
-(defvar lightning-init-file (concat lightning-core-directory "init")
-  "Core file of lightining, core in lightning-core-directory by default")
-
-(defvar lightning-config-init-file (concat lightning-config-directory "init")
-  "User config file, init in lightning-config-directory by default")
+(defvar lightning-config-directory (concat (parent-directory user-emacs-directory) ".lightning.d/")
+  "Directory containing user config, set to .lightning.d in parent of user-emacs-directory by default, can be modified at startup with --lightning-config-directory")
 
 (defvar lightning-suppress-config-errors t
   "Ignores errors invoked while loading a config file with the lightning-load-config function")
@@ -35,7 +26,7 @@
 (defun lightning-reload-core()
   "Reloads lightning"
   (interactive)
-  (lightning-load lightning-init-file :suppress-errors nil))
+  (lightning-load "init" :directory lightning-core-directory :suppress-errors nil))
 
 (defvar lightning-loaded-modules '()
   "List of loaded lightning modules")
@@ -62,7 +53,8 @@
 (defun lightning-reload-config()
   "Reloads user config"
   (interactive)
-  (lightning-load lightning-config-init-file :suppress-errors lightning-suppress-config-errors))
+  (lightning-load-config "init"))
 
 (lightning-load "error" :directory lightning-core-directory)
 (lightning-load "user" :directory lightning-core-directory)
+(lightning-load "arguments" :directory lightning-core-directory)
