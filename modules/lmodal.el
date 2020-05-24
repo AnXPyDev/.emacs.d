@@ -25,7 +25,11 @@
        ,(plist-get args :lighter)
        ,(plist-get args :keymap)
        (if ,(lmodal-extern-mode-name name)
-         ,(plist-get args :on-enable)
+         (progn
+           ,(plist-get args :on-enable)
+           ,(when (plist-member args :cursor)
+              `(setq cursor-type ,(plist-get args :cursor)))
+           )
          ,(plist-get args :on-disable)))
      (defun ,(lmodal-raise-function-name name) nil
        (interactive)

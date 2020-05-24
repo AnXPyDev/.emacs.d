@@ -1,4 +1,4 @@
-(defun lightning-lookup-fonts(&rest fonts)
+(defun lookup-fonts(&rest fonts)
   "Finds the first available font from inputted arguments"
   (catch 'font
     (dolist (font fonts)
