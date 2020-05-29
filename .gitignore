@@ -2,7 +2,4 @@
 
 !.gitignore
 !init.el
-!/core
-!/modules
-!/config
-!/banner.png
+!README.org
