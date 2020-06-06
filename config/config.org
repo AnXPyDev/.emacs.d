@@ -83,6 +83,38 @@ Electric pairs mode
     :ensure t
     :config (global-undo-tree-mode 1))
 #+END_SRC
+* Eshell
+** count of shells
+#+BEGIN_SRC emacs-lisp
+  (defvar eshell-count 0)
+#+END_SRC
+** goto last eshell buffer
+#+BEGIN_SRC emacs-lisp
+  (defun eshell-last-buffer()
+    (interactive)
+    (catch 'break
+      (dolist (buffer (buffer-list))
+        (when (cl-search "*eshell*" (buffer-name buffer))
+          (switch-to-buffer buffer)
+          (throw 'break t)))))
+#+END_SRC
+** toggle-eshell
+#+BEGIN_SRC emacs-lisp
+  (defun eshell-toggle()
+    (interactive)
+    (if (cl-search "*eshell*" (buffer-name))
+      (previous-buffer)
+      (unless (eshell-last-buffer)
+        (eshell-new))))
+#+END_SRC
+** spawn new shell
+#+BEGIN_SRC emacs-lisp
+  (defun eshell-new()
+    (interactive)
+    (setq eshell-count (+ eshell-count 1))
+    (eshell eshell-count))
+#+END_SRC
+* Macros
 * Languages
 ** Lisp
 Fix lisp indenting
@@ -90,6 +122,7 @@ Fix lisp indenting
   (setq lisp-indent-offset tab-width)
 #+END_SRC
 ** C
+Fix enum indent
 #+BEGIN_SRC emacs-lisp
   (add-hook 'c-mode-hook (lambda() (c-set-offset 'brace-list-intro tab-width)))
   (add-hook 'c-mode-hook (lambda() (c-set-offset 'brace-list-entry 0)))
@@ -160,7 +193,9 @@ Fix lisp indenting
     "C-d" 'dired
     "s" 'save-buffer
     "C-s" 'save-some-buffers
-    "M-s" 'save-some-buffers)
+    "M-s" 'save-some-buffers
+    "RET" 'eshell-toggle
+    "C-RET" 'eshell-new)
 #+END_SRC
 ** Globals
 #+BEGIN_SRC emacs-lisp
@@ -319,6 +354,14 @@ Initialize lmodal
   (lmodal-global-mode 1)
 #+END_SRC
 * Appearance
+** Highlight indentation guides
+#+BEGIN_SRC emacs-lisp
+  (use-package highlight-indent-guides
+    :ensure t
+    :config
+    (setq hightlight-indent-guides-method 'character)
+    (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
+#+END_SRC
 ** All the icons
 #+BEGIN_SRC emacs-lisp
   (use-package all-the-icons
@@ -349,7 +392,7 @@ Install telephone line
 #+END_SRC
 ** Themes
 #+BEGIN_SRC emacs-lisp
-  ;;(use-package arc-dark-theme)
+  (use-package doom-themes)
 #+END_SRC
 ** Theme for gui
 #+BEGIN_SRC emacs-lisp
@@ -364,7 +407,8 @@ Install telephone line
     (set-face-font 'default
       (concat
         (lookup-fonts
-          "Consolas")
+          "Consolas"
+          "Monospace")
         " 12")))
 #+END_SRC
 ** Theme for tui
@@ -393,6 +437,6 @@ General theme loader
     (reload-theme))
 
   (if (display-graphic-p)
-    (load-theme 'arc-dark)
+    (load-theme 'doom-dark+)
     (reload-theme))
 #+END_SRC
