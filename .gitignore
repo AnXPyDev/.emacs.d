@@ -2,4 +2,9 @@
 
 !.gitignore
 !init.el
+!config/*.el
+config/config.el
+!config/config.org
+!config/banner.png
+!modules/*.el
 !README.org
