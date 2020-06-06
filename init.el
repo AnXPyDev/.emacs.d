@@ -1,15 +1,9 @@
 (setq custom-file (concat user-emacs-directory "custom"))
 
-(defun parent-directory(dir)
-  (file-name-directory (directory-file-name dir)))
-
-(defvar lightning-core-directory (concat user-emacs-directory "core/")
-  "Directory containing lightining core, set to core in lightning-emacs-directory by default")
-
-(defvar lightning-config-directory (concat (file-name-directory (directory-file-name user-emacs-directory)) ".lightning.d/")
+(defvar lightning-config-directory (concat user-emacs-directory "config/")
   "Directory containing user config, set to .lightning.d in parent of user-emacs-directory by default, can be modified at startup with --lightning-config-directory")
 
-(defvar lightning-modules-directory (concat lightning-config-directory "modules/")
+(defvar lightning-modules-directory (concat user-emacs-directory "modules/")
   "Directory containing lightining modules, set to modules in lightning-emacs-directory by default")
 
 (defvar lightning-suppress-config-errors t
@@ -34,11 +28,6 @@
       err
       :message (concat "[ERR] An error was encountered when loading " name)
       :rethrow-error (not (plist-get args :suppress-errors))))))
-
-(defun lightning-reload-core()
-  "Reloads lightning"
-  (interactive)
-  (lightning-load "init" :directory lightning-core-directory :suppress-errors nil))
 
 (defvar lightning-loaded-modules '()
   "List of loaded lightning modules")
