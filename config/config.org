@@ -60,7 +60,11 @@ Electric pairs mode
 #+BEGIN_SRC emacs-lisp
   (use-package ivy
     :ensure t
-    :config (ivy-mode 1))
+    :config
+    (setq ivy-format-function 'ivy-format-function-line)
+    (setf (alist-get 't ivy-format-functions-alist)
+      #'ivy-format-function-line)
+    (ivy-mode 1))
 #+END_SRC
 ** general
 #+BEGIN_SRC emacs-lisp
@@ -194,12 +198,22 @@ Fix enum indent
     "s" 'save-buffer
     "C-s" 'save-some-buffers
     "M-s" 'save-some-buffers
+    "b" 'ivy-switch-buffer
+    "k" 'kill-buffer
     "RET" 'eshell-toggle
-    "C-RET" 'eshell-new)
+    "C-RET" 'eshell-new
+    "0" 'delete-window
+    "o" 'other-window
+    "3" 'split-window-right
+    "2" 'split-window-below
+    )
 #+END_SRC
-** Globals
+** Emacs
 #+BEGIN_SRC emacs-lisp
+  (setq emacs-map (make-sparse-keymap))
+
   (general-define-key
+    :keymaps 'emacs-map
     "C-z" leader-map
     "C-e" command-map
     "M-q" 'lmodal-raise-default-mode
@@ -207,7 +221,11 @@ Fix enum indent
 #+END_SRC
 ** Bare normal map
 #+BEGIN_SRC emacs-lisp
-  (setq modal-normal-bare-map (make-sparse-keymap))
+  (setq modal-normal-bare-map
+    (make-composed-keymap
+      (list
+        (copy-keymap emacs-map)
+        (make-sparse-keymap))))
 
   (general-define-key
     :keymaps 'modal-normal-bare-map
@@ -289,7 +307,7 @@ Fix enum indent
 #+END_SRC
 ** Insert map
 #+BEGIN_SRC emacs-lisp
-  (setq modal-insert-map (make-sparse-keymap))
+  (setq modal-insert-map (copy-keymap emacs-map))
 
   (general-define-key
     :keymaps 'modal-insert-map
@@ -319,6 +337,7 @@ Cursors for modes
 Define modes
 #+BEGIN_SRC emacs-lisp
   (lmodal-define-mode emacs
+    :keymap emacs-map
     :lighter " [E]"
     :cursor modal-emacs-cursor)
 
@@ -359,7 +378,7 @@ Initialize lmodal
   (use-package highlight-indent-guides
     :ensure t
     :config
-    (setq hightlight-indent-guides-method 'character)
+    (setq highlight-indent-guides-method 'character)
     (add-hook 'prog-mode-hook 'highlight-indent-guides-mode))
 #+END_SRC
 ** All the icons
@@ -397,7 +416,8 @@ Install telephone line
 ** Theme for gui
 #+BEGIN_SRC emacs-lisp
   (defun theme-gui()
-    (fringe-mode '(0 . 0))
+    (global-hl-line-mode t)
+    ;; (fringe-mode '(0 . 0))
     (push
       (cons 'internal-border-width 6)
       default-frame-alist)
@@ -437,6 +457,6 @@ General theme loader
     (reload-theme))
 
   (if (display-graphic-p)
-    (load-theme 'doom-dark+)
+    (load-theme 'doom-horizon)
     (reload-theme))
 #+END_SRC
