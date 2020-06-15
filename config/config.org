@@ -164,7 +164,7 @@ Fix enum indent
     (end-of-line)
     (open-line 1))
 
-  (defun edit--paste-whole-line()
+  (defun edit--yank-whole-line()
     (interactive)
     (edit--open-line-below)
     (next-line)
@@ -174,7 +174,28 @@ Fix enum indent
     (interactive)
     (beginning-of-line)
     (lmodal-raise-region-mode)
-    (end-of-line))
+    (next-line))
+
+  (defun edit--region-kill()
+    (interactive)
+    (kill-region (region-beginning) (region-end))
+    (lmodal-raise-default-mode))
+
+  (defun edit--region-copy()
+    (interactive)
+    (edit--region-kill)
+    (yank))
+
+  (defun edit--region-paste()
+    (interactive)
+    (delete-region (region-beginning) (region-end))
+    (yank)
+    (lmodal-raise-default-mode))
+
+  (defun edit--region-substitute()
+    (interactive)
+    (delete-region (region-beginning) (region-end))
+    (lmodal-raise-insert-mode))
 #+end_src
 * Keybindings
 ** Leader map
@@ -284,7 +305,12 @@ Fix enum indent
 #+END_SRC
 ** Region map
 #+BEGIN_SRC emacs-lisp
-  (setq modal-region-map (copy-keymap modal-normal-bare-map))
+  (setq modal-region-map
+    (make-composed-keymap
+      (list
+        (copy-keymap modal-normal-bare-map)
+        (make-no-insert-keymap))))
+
 
   (general-define-key
     :keymaps 'modal-region-map
@@ -292,17 +318,11 @@ Fix enum indent
     "C-g" 'lmodal-raise-default-mode
     "M-q" 'lmodal-raise-default-mode
     "r" 'er/expand-region
-    "c" (lambda() (interactive)
-          (kill-region (region-beginning) (region-end))
-          (yank)
-          (lmodal-raise-default-mode))
-    "v" (lambda() (interactive)
-          (delete-region (region-beginning) (region-end))
-          (yank)
-          (lmodal-raise-default-mode))
-    "d" (lambda() (interactive)
-          (kill-region (region-beginning) (region-end))
-          (lmodal-raise-default-mode))
+    "c" 'edit--region-copy
+    "d" 'edit--region-kill
+    "v" 'edit--region-paste
+    "t" 'edit--region-substitute
+    ";" 'comment-region
     )
 #+END_SRC
 ** Insert map
@@ -325,8 +345,20 @@ Fix enum indent
     "M-k" 'ivy-previous-line
     "TAB" 'ivy-partial-or-done
     "RET" 'ivy-done
-    "C-RET" 'ivy-immediate-done)
+    "<C-return>" 'ivy-immediate-done)
 #+END_SRC
+** Eshell
+#+BEGIN_SRC emacs-lisp
+  (setq modal-eshell-map (copy-keymap emacs-map))
+
+
+
+  (defun eshell-attach-map()
+    (setq eshell-map modal-eshell-map))
+
+  (add-hook 'eshell-mode-hook 'eshell-attach-map)
+#+END_SRC
+
 * Modal
 Cursors for modes
 #+BEGIN_SRC emacs-lisp
@@ -346,7 +378,8 @@ Define modes
     :lighter " [N]"
     :cursor modal-normal-cursor)
 
-  (lmodal-define-mode normal-org
+  (lmodal-define-mode normal
+    :major-mode org-mode
     :keymap modal-normal-org-map
     :lighter " [N-org]"
     :cursor modal-normal-cursor)
@@ -366,9 +399,8 @@ Define modes
 Initialize lmodal
 #+BEGIN_SRC emacs-lisp
   (lmodal-set-default-mode normal)
-  (lmodal-pair-major-mode org-mode normal-org)
-  (lmodal-pair-major-mode dired-mode emacs)
-  (lmodal-pair-major-mode eshell-mode emacs)
+  (lmodal-set-default-mode emacs dired-mode)
+  (lmodal-set-default-mode emacs eshell-mode)
 
   (lmodal-global-mode 1)
 #+END_SRC
@@ -406,8 +438,26 @@ Initialize lmodal
   (global-prettify-symbols-mode t)
 #+END_SRC
 ** Modeline
-Install telephone line
 #+BEGIN_SRC emacs-lisp
+  ;; (setq-default mode-line-format
+  ;;   " %m")
+#+END_SRC
+** Headerline
+#+BEGIN_SRC emacs-lisp
+  (setq-default header-line-format
+    " %b")
+#+END_SRC
+Gui Theme
+#+BEGIN_SRC emacs-lisp
+  (defun theme-headerline-gui()
+    (set-face-attribute 'header-line nil
+      :foreground (face-attribute 'line-number-current-line :foreground)
+      :height 110))
+#+END_SRC
+** Beacon
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package beacon
+  ;;   :ensure t)
 #+END_SRC
 ** Themes
 #+BEGIN_SRC emacs-lisp
@@ -417,19 +467,16 @@ Install telephone line
 #+BEGIN_SRC emacs-lisp
   (defun theme-gui()
     (global-hl-line-mode t)
-    ;; (fringe-mode '(0 . 0))
-    (push
-      (cons 'internal-border-width 6)
-      default-frame-alist)
-    (dolist (prop default-frame-alist)
-      (set-frame-parameter (selected-frame)
-        (car prop) (cdr prop)))
+    ;; (beacon-mode)
     (set-face-font 'default
       (concat
         (lookup-fonts
           "Consolas"
           "Monospace")
-        " 12")))
+        " 12"))
+    (theme-headerline-gui)
+    (set-face-attribute 'fringe nil
+      :background (face-attribute 'default :background)))
 #+END_SRC
 ** Theme for tui
 #+BEGIN_SRC emacs-lisp
@@ -439,6 +486,10 @@ Install telephone line
 Line numbers
 #+BEGIN_SRC emacs-lisp
   (global-display-line-numbers-mode 1)
+#+END_SRC
+Visual line mode
+#+BEGIN_SRC emacs-lisp
+  (global-visual-line-mode 1)
 #+END_SRC
 General theme loader
 #+BEGIN_SRC emacs-lisp
@@ -457,6 +508,6 @@ General theme loader
     (reload-theme))
 
   (if (display-graphic-p)
-    (load-theme 'doom-horizon)
+    (load-theme 'doom-wilmersdorf)
     (reload-theme))
 #+END_SRC
