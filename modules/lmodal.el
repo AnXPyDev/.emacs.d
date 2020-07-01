@@ -88,10 +88,7 @@
     `(progn
        (lmodal-disable-all-modes)
        (eval `(lmodal-enable-mode ,',name ,major-mode)))
-    (progn
-      (lmodal-disable-all-modes)
-      (eval `(lmodal-enable-mode ,(lmodal-get-default-mode major-mode) ,major-mode)))))
-
+    ))
 
 (defun lmodal-raise-default-mode()
   (interactive)
@@ -100,6 +97,6 @@
       
 (define-minor-mode lmodal-mode "Minor mode that manages lmodal modes" nil " Lmodal" nil
   (when lmodal-mode
-    (lmodal-raise-mode)))
+    (lmodal-raise-default-mode)))
 
-(define-globalized-minor-mode lmodal-global-mode lmodal-mode (lambda() (lmodal-mode 1)))
+(define-globalized-minor-mode lmodal-global-mode lmodal-mode (lambda() (unless (minibufferp) (lmodal-mode 1))))

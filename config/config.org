@@ -55,6 +55,10 @@ Electric pairs mode
 #+BEGIN_SRC emacs-lisp
   (electric-pair-mode 1)
 #+END_SRC
+Text mode as default major mode
+#+BEGIN_SRC emacs-lisp
+  (setq-default major-mode 'text-mode)
+#+END_SRC
 * Packages
 ** ivy
 #+BEGIN_SRC emacs-lisp
@@ -198,6 +202,10 @@ Fix enum indent
     (lmodal-raise-insert-mode))
 #+end_src
 * Keybindings
+** Global map
+#+BEGIN_SRC emacs-lisp
+  (general-define-key)
+#+END_SRC
 ** Leader map
 #+BEGIN_SRC emacs-lisp
   (setq leader-map (make-sparse-keymap))
@@ -293,6 +301,7 @@ Fix enum indent
     "v" 'yank
     "V" (lambda() (interactive) (end-of-line) (open-line 1) (next-line) (yank))
     ";" 'comment-line
+    "TAB" (kbd "<tab>")
     )
 #+END_SRC
 ** Normal org map
@@ -359,6 +368,13 @@ Fix enum indent
   (add-hook 'eshell-mode-hook 'eshell-attach-map)
 #+END_SRC
 
+** Text mode
+#+BEGIN_SRC emacs-lisp
+  (general-define-key
+    :keymaps 'text-mode-map
+    "<tab>" 'tab-to-tab-stop
+    "TAB" (kbd "<tab>"))
+#+END_SRC
 * Modal
 Cursors for modes
 #+BEGIN_SRC emacs-lisp
