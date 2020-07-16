@@ -138,6 +138,11 @@ Fix enum indent
 
   (add-hook 'c-mode-hook 'c-fix-offsets)
 #+END_SRC
+** Meson
+#+BEGIN_SRC emacs-lisp
+  (use-package meson-mode
+    :ensure t)
+#+END_SRC
 * Editing functions
 #+begin_src emacs-lisp
   (defun edit--insert-beginning-of-line()
@@ -483,7 +488,11 @@ Gui Theme
 #+END_SRC
 ** Themes
 #+BEGIN_SRC emacs-lisp
-  (use-package doom-themes)
+  (use-package doom-themes
+    :ensure t)
+
+  (use-package kaolin-themes
+    :ensure t)
 #+END_SRC
 ** Theme for gui
 #+BEGIN_SRC emacs-lisp
@@ -534,8 +543,15 @@ General theme loader
       (theme-tui))
     (theme-general))
 
+  (defun disable-all-custom-themes()
+    (dolist (theme custom-enabled-themes)
+      (disable-theme theme)))
+
   (defadvice load-theme (after load-theme-after activate)
     (reload-theme))
+
+  (defadvice load-theme (before load-theme-before activate)
+    (disable-all-custom-themes))
 
   (if (display-graphic-p)
     (load-theme 'doom-wilmersdorf)
