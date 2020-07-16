@@ -132,8 +132,11 @@ Fix lisp indenting
 ** C
 Fix enum indent
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'c-mode-hook (lambda() (c-set-offset 'brace-list-intro tab-width)))
-  (add-hook 'c-mode-hook (lambda() (c-set-offset 'brace-list-entry 0)))
+  (defun c-fix-offsets()
+    (c-set-offset 'brace-list-intro tab-width)
+    (c-set-offset 'brace-list-entry 0))
+
+  (add-hook 'c-mode-hook 'c-fix-offsets)
 #+END_SRC
 * Editing functions
 #+begin_src emacs-lisp
@@ -230,7 +233,7 @@ Fix enum indent
     "b" 'ivy-switch-buffer
     "k" 'kill-buffer
     "RET" 'eshell-toggle
-    "C-RET" 'eshell-new
+    "<C-return>" 'eshell-new
     "0" 'delete-window
     "o" 'other-window
     "3" 'split-window-right
@@ -417,6 +420,7 @@ Initialize lmodal
   (lmodal-set-default-mode normal)
   (lmodal-set-default-mode emacs dired-mode)
   (lmodal-set-default-mode emacs eshell-mode)
+  (lmodal-set-default-mode emacs term-mode)
 
   (lmodal-global-mode 1)
 #+END_SRC
@@ -455,8 +459,10 @@ Initialize lmodal
 #+END_SRC
 ** Modeline
 #+BEGIN_SRC emacs-lisp
-  ;; (setq-default mode-line-format
-  ;;   " %m")
+  (use-package powerline
+    :ensure t
+    :config
+    (powerline-center-theme))
 #+END_SRC
 ** Headerline
 #+BEGIN_SRC emacs-lisp
@@ -502,6 +508,14 @@ Gui Theme
 Line numbers
 #+BEGIN_SRC emacs-lisp
   (global-display-line-numbers-mode 1)
+#+END_SRC
+Disable line numbers in terminals
+#+BEGIN_SRC emacs-lisp
+  (defun disable-display-line-numbers()
+    (display-line-numbers-mode 0))
+
+  (add-hook 'term-mode-hook 'disable-display-line-numbers)
+  (add-hook 'eshell-mode-hook 'disable-display-line-numbers)
 #+END_SRC
 Visual line mode
 #+BEGIN_SRC emacs-lisp
