@@ -138,6 +138,10 @@ Fix enum indent
 
   (add-hook 'c-mode-hook 'c-fix-offsets)
 #+END_SRC
+** Shell Script
+#+BEGIN_SRC emacs-lisp
+  (setq sh-basic-offset tab-width)
+#+END_SRC
 ** Meson
 #+BEGIN_SRC emacs-lisp
   (use-package meson-mode
@@ -267,7 +271,7 @@ Fix enum indent
   (general-define-key
     :keymaps 'modal-normal-bare-map
     "M-e" 'lmodal-raise-emacs-mode
-    "z" leader-map
+    "z" leader-map                        ;
     "e" command-map
     "h" 'backward-char
     "j" 'next-line
@@ -364,6 +368,21 @@ Fix enum indent
     "RET" 'ivy-done
     "<C-return>" 'ivy-immediate-done)
 #+END_SRC
+** Dired
+#+BEGIN_SRC emacs-lisp
+  (setq dired-mode-map (copy-keymap modal-normal-bare-map))
+
+  (general-define-key
+    :keymaps 'dired-mode-map
+    "n" 'dired-create-directory
+    "m" 'dired-mark
+    "U" 'dired-unmark-all-marks
+    "u" 'dired-unmark
+    "d" 'dired-do-delete
+    "r" 'dired-do-rename
+    "f" 'dired-find-file
+    )
+#+END_SRC
 ** Eshell
 #+BEGIN_SRC emacs-lisp
   (setq modal-eshell-map (copy-keymap emacs-map))
@@ -426,6 +445,7 @@ Initialize lmodal
   (lmodal-set-default-mode emacs dired-mode)
   (lmodal-set-default-mode emacs eshell-mode)
   (lmodal-set-default-mode emacs term-mode)
+  (lmodal-set-default-mode emacs shell-mode)
 
   (lmodal-global-mode 1)
 #+END_SRC
@@ -525,6 +545,7 @@ Disable line numbers in terminals
 
   (add-hook 'term-mode-hook 'disable-display-line-numbers)
   (add-hook 'eshell-mode-hook 'disable-display-line-numbers)
+  (add-hook 'shell-mode-hook 'disable-display-line-numbers)
 #+END_SRC
 Visual line mode
 #+BEGIN_SRC emacs-lisp
