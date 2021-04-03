@@ -5,7 +5,8 @@
   (lightning-load-module "lmodal")
   (lightning-load-module "make-no-insert-keymap")
 #+END_SRC
-* User variables
+* User 
+variables
 #+BEGIN_SRC emacs-lisp
   (setq user-name "AnXPyDev")
 #+END_SRC
@@ -40,8 +41,8 @@ Treat all themes as safe
 #+END_SRC
 Indentation
 #+BEGIN_SRC emacs-lisp
-  (setq-default tab-width 2)
-  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 4)
+  (setq-default indent-tabs-mode t)
 #+END_SRC
 Default cursor
 #+begin_src emacs-lisp
@@ -271,7 +272,7 @@ Fix enum indent
   (general-define-key
     :keymaps 'modal-normal-bare-map
     "M-e" 'lmodal-raise-emacs-mode
-    "z" leader-map                        ;
+    "z" leader-map
     "e" command-map
     "h" 'backward-char
     "j" 'next-line
@@ -386,8 +387,6 @@ Fix enum indent
 ** Eshell
 #+BEGIN_SRC emacs-lisp
   (setq modal-eshell-map (copy-keymap emacs-map))
-
-
 
   (defun eshell-attach-map()
     (setq eshell-map modal-eshell-map))
